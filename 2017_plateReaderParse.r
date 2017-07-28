@@ -1,5 +1,7 @@
 
 #################notes#################
+#TODO - FIX FORMATTING + PARSING FOR FRAISER LAB DATA
+
 #add in the factor for which tecan was used
 #tecan 1 is our tecan, tecan 2 is the tecan in the other lab
 #experiment 5 was weird, experiment 7 was weird (6/7/17), both ran on tecan 1
@@ -25,14 +27,14 @@ library(ggplot2)
 library(lme4)
 
 #### specifying paths and various conditions####################
-experimentlist<-c("/users/human/Desktop/042017_First_Tecan_Run_2.csv", "/users/human/Downloads/042517_Second_Tecan_Run.csv", "/users/human/Downloads/042817_Third_Tecan_Run.csv", "/users/human/Downloads/051517_Fourth_Tecan_Run.csv", "/users/human/Downloads/051517_Fifth_Tecan_Run-3.csv", "/users/human/Desktop/060617_Sixth_Tecan_Run.csv", "/users/human/Desktop/060717_Seventh_Tecan_Run.csv", "/users/human/Desktop/061317_Eighth_Tecan_Run.csv")
+experimentlist<-c("/users/human/Desktop/Tecan/042017_First_Tecan_Run_2.csv", "/users/human/Desktop/Tecan/042517_Second_Tecan_Run.csv", "/users/human/Desktop/Tecan/042817_Third_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fourth_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fifth_Tecan_Run-3.csv", "/users/human/Desktop/Tecan/060617_Sixth_Tecan_Run.csv", "/users/human/Desktop/Tecan/060717_Seventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/061317_Eighth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Ninth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Tenth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Eleventh_Tecan_Run.csv")
 
 #paths to graph files
 pdflist<-c(gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun1')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun2')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun3')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun4')),gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun5')),
-    gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun6')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun7')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun8')))
+    gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun6')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun7')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun8')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun9')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun10')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun11')))
 
 #paths to GR files
-grfilelist<-c('/Users/human/Desktop/TecanRunGR/GR1.rfile', '/Users/human/Desktop/TecanRunGR/GR2.rfile', '/Users/human/Desktop/TecanRunGR/GR3.rfile', '/Users/human/Desktop/TecanRunGR/GR4.rfile', '/Users/human/Desktop/TecanRunGR/GR5.rfile', '/Users/human/Desktop/TecanRunGR/GR6.rfile', '/Users/human/Desktop/TecanRunGR/GR7.rfile', '/Users/human/Desktop/TecanRunGR/GR8.rfile')
+grfilelist<-c('/Users/human/Desktop/TecanRunGR/GR1.rfile', '/Users/human/Desktop/TecanRunGR/GR2.rfile', '/Users/human/Desktop/TecanRunGR/GR3.rfile', '/Users/human/Desktop/TecanRunGR/GR4.rfile', '/Users/human/Desktop/TecanRunGR/GR5.rfile', '/Users/human/Desktop/TecanRunGR/GR6.rfile', '/Users/human/Desktop/TecanRunGR/GR7.rfile', '/Users/human/Desktop/TecanRunGR/GR8.rfile', '/Users/human/Desktop/TecanRunGR/GR9.rfile', '/Users/human/Desktop/TecanRunGR/GR10.rfile', '/Users/human/Desktop/TecanRunGR/GR11.rfile')
 
 #conditions
 C1<-rep(c("1.5% Glucose", "1.7% Glucose", "1.8% Glucose", "2.5% Glucose", "8.5µM GDA", "5µM Rad", "2µg/mL Flu", "1.5% Glucose", "0.5% DMSO", "2µg/mL Flu",  "5µM Rad", "8.5µM GDA"),8) #run 1
@@ -43,25 +45,30 @@ C3<-rep(rep(c("1.5% Glucose", "1.7% Glucose", "1.8% Glucose", "2.5% Glucose" ), 
 
 C4<-rep(rep(c("2.5% Glucose", "1.8% Glucose", "1.7% Glucose", "1.5% Glucose" ), each = 12),2) # run 4
 
-C5<-c(rep(c("2.5% Glucose", "1.8% Glucose", "1.7% Glucose", "1.5% Glucose" ), each = 12), rep(c("1.5% Glucose", "1.7% Glucose", "1.8% Glucose", "2.5% Glucose" ), each = 12)) # run 5, bad data with INVALIDS
+C5<-c(rep(c("2.5% Glucose", "1.8% Glucose", "1.7% Glucose", "1.5% Glucose" ), each = 12), rep(c("1.5% Glucose", "1.7% Glucose", "1.8% Glucose", "2.5% Glucose" ), each = 12)) # run 5, bad data with INVALIDS (RUN ON OUR TECAN)
 
 C6<-rep(rep(c("2.5% Glucose", "1.8% Glucose", "1.7% Glucose", "1.5% Glucose" ), each = 12),2)
-#run 6, a rerun of the failed experiment on 6/5 with iranon and iramis
+#run 6, a rerun of the failed experiment on 6/5 with iranon and iramis (HADLY TECAN)
 
 
-C7<-rep(c("1.5% Glucose"),96) # run 7 the bad data one with INVALIDS
+C7<-rep(c("1.5% Glucose"),96) # run 7 the bad data one with INVALIDS (RAN ON OUR TECAN - BROKEN)
 
-C8<-rep(c("1.5% Glucose"),96) # run 8 rerun of run 7 because of bad data, with iranon and iramis and only 1.5% because I wanted to focus on the effect of gene and not really condition
+C8<-rep(c("1.5% Glucose"),96) # run 8 rerun of run 7 because of bad data, with iranon and iramis and only 1.5% because I wanted to focus on the effect of gene and not really condition (ON COUNTER, HADLY TECAN)
 
+C9<-rep(c("1.5% Glucose"),96) # run 9 (NEW BATCH, HADLY TECAN)
 
-datelist<-c(042017,042617,042817,051517,051517, 060617, 060717, 061317)
+C10<-rep(c("1.5% Glucose"), 96) # run 10 Hadly Tecan 7_24
 
-sdthreshold<-c(0.33,0.57,0.45, 0.33, 0.1, 0.1, 0.1, 0.1) #TODO replace w/ actual math
+C11<-rep(c("1.5% Glucose"), 96) # run 11 Fraiser Tecan 7_24
+
+datelist<-c(042017,042617,042817,051517,051517, 060617, 060717, 061317, 071317, 072017, 072417, 072417)
+
+sdthreshold<-c(0.33,0.57,0.45, 0.33, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1) #TODO replace w/ actual math
 
 ################starting giant for loop through each experiment###########################
 #for (path in 1:length(experimentlist)){
-path<- 1
-while (path<9){
+path<- 9
+while (path<12){
     if (path == 5 | path == 7){
         path<- path+1
     }
@@ -236,34 +243,48 @@ while (path<9){
         GR$Gene<-"ANC"
         GR$Condition<-C1
         GR1<-GR
+        
     } else if (path == 2) {
         GR$Gene<-"ANC"
          GR$Condition<-C2
          GR2<-GR
+         
     } else if (path == 3){
         GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 4),8) # run 3
          GR$Condition<-C3
          GR3<-GR
+         
     } else if (path == 4){
         GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 1),32) # run 4
         GR$Condition<-C4
         GR4<-GR
+        
     } else if (path == 5){
         GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 5
         GR$Condition<-C5
         GR5<-GR
+        
     } else if (path == 6){
-         GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 5
+         GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 6
         GR$Condition<-C6
         
     } else if (path == 7){
         GR$Gene<-c(rep("IRA_NON",12),rep("IRA_MIS",12),rep("RAS2",6), rep("TOR",6),rep("ANC",12),rep("RAS2",12), rep("TOR",12), rep("IRA_NON",12),rep("IRA_MIS",12))
         GR$Condition<-C7
         
-    } else {
-        GR$Gene<-c(rep("IRA_NON",12),rep("IRA_MIS",12),rep("RAS2",6), rep("TOR",6),rep("ANC",12),rep("RAS2",12), rep("TOR",12), rep("IRA_NON",12),rep("IRA_MIS",12))
+    } else if (path == 8){
+        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
         GR$Condition<-C8
+        
+    } else if (path == 9 | path == 10 | path == 11) {
+        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+        GR$Condition<-C9
+        
+    } else {
+        print("none of the paths were listed above, genes not assigned!!")
     }
+    
+    
 
     
     save(GR, file = grfilelist[path])
