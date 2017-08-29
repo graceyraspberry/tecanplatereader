@@ -1,39 +1,19 @@
-
-#################notes#################
-#TODO - FIX FORMATTING + PARSING FOR FRAISER LAB DATA
-
-#add in the factor for which tecan was used
-#tecan 1 is our tecan, tecan 2 is the tecan in the other lab
-#experiment 5 was weird, experiment 7 was weird (6/7/17), both ran on tecan 1
-#tecan 1: experiment 4,5,7
-#tecan 2: experiment 1,2,3,6,8
-
-#another potential variable: "BAD DATA?" for experiments that did not work out?
-#another potential variable: "preculture?" which differentiates between the two that did not have initial transfer to M3
-
-#add in an element for the experiments which is "control wells" - the ones that are supposedly empty - so it doesn't bias data
-#try to fix the Tecan???
-#run linears again on the entire data set + the new data
-#try to figure out how to use experiment 5 and 7 data (or at least look at the data and see if it is usable)
-#blog post?
-
-
-
-#####  Clean up raw data from plate reader
-
-#LIBRARIES
+#load libraries
 
 library(ggplot2)
 library(lme4)
 
 #### specifying paths and various conditions####################
-experimentlist<-c("/users/human/Desktop/Tecan/042017_First_Tecan_Run_2.csv", "/users/human/Desktop/Tecan/042517_Second_Tecan_Run.csv", "/users/human/Desktop/Tecan/042817_Third_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fourth_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fifth_Tecan_Run-3.csv", "/users/human/Desktop/Tecan/060617_Sixth_Tecan_Run.csv", "/users/human/Desktop/Tecan/060717_Seventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/061317_Eighth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Ninth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Tenth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Eleventh_Tecan_Run.csv")
+
+experimentlist<-c("/users/human/Desktop/Tecan/041717_First_Tecan_Run.csv", "/users/human/Desktop/Tecan/042017_Second_Tecan_Run.csv", "/users/human/Desktop/Tecan/042617_Third_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fourth_Tecan_Run.csv", "/users/human/Desktop/Tecan/052317_Fifth_Tecan_Run-3.csv", "/users/human/Desktop/Tecan/060617_Sixth_Tecan_Run.csv", "/users/human/Desktop/Tecan/060717_Seventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/061317_Eighth_Tecan_Run.csv", "/users/human/Desktop/Tecan/071317_Ninth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Tenth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Eleventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Twelth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Thirteenth_Tecan_Run.csv")
 
 #paths to graph files
+#TODO: replace all of this stuff with a for loop with substrings
 pdflist<-c(gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun1')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun2')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun3')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun4')),gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun5')),
     gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun6')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun7')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun8')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun9')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun10')), gsub(" ","", paste('/Users/human/Desktop/TecanRunGraphs/',gsub(" ","_", as.character(Sys.time())),'_TecanRun11')))
 
 #paths to GR files
+#TODO: replace all of these with for loop with substring as well
 grfilelist<-c('/Users/human/Desktop/TecanRunGR/GR1.rfile', '/Users/human/Desktop/TecanRunGR/GR2.rfile', '/Users/human/Desktop/TecanRunGR/GR3.rfile', '/Users/human/Desktop/TecanRunGR/GR4.rfile', '/Users/human/Desktop/TecanRunGR/GR5.rfile', '/Users/human/Desktop/TecanRunGR/GR6.rfile', '/Users/human/Desktop/TecanRunGR/GR7.rfile', '/Users/human/Desktop/TecanRunGR/GR8.rfile', '/Users/human/Desktop/TecanRunGR/GR9.rfile', '/Users/human/Desktop/TecanRunGR/GR10.rfile', '/Users/human/Desktop/TecanRunGR/GR11.rfile')
 
 #conditions
@@ -55,15 +35,51 @@ C7<-rep(c("1.5% Glucose"),96) # run 7 the bad data one with INVALIDS (RAN ON OUR
 
 C8<-rep(c("1.5% Glucose"),96) # run 8 rerun of run 7 because of bad data, with iranon and iramis and only 1.5% because I wanted to focus on the effect of gene and not really condition (ON COUNTER, HADLY TECAN)
 
-C9<-rep(c("1.5% Glucose"),96) # run 9 (NEW BATCH, HADLY TECAN)
+C9<-rep(c("1.5% Glucose"),96) # run 9 (NEW BATCH, HADLY TECAN) 7/13
 
-C10<-rep(c("1.5% Glucose"), 96) # run 10 Hadly Tecan 7_24
+C10<-rep(c("1.5% Glucose"), 96) # run 10 Hadly Tecan 7_20
 
-C11<-rep(c("1.5% Glucose"), 96) # run 11 Fraiser Tecan 7_24
+C11<-rep(c("1.5% Glucose"), 96) # run 11 Fraiser Tecan 7_20
 
-datelist<-c(042017,042617,042817,051517,051517, 060617, 060717, 061317, 071317, 072017, 072417, 072417)
+C12<-rep(c("1.5% Glucose"),96) # run 12 Hadly Tecan 7_24
 
-sdthreshold<-c(0.33,0.57,0.45, 0.33, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1) #TODO replace w/ actual math
+C13<-rep(c("1.5% Glucose"),96) # run 13 Fraiser Tecan 7_24
+
+conditionlist<-c(C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13)
+
+datelist<-c(042017,042617,042817,051517,051517, 060617, 060717, 061317, 071317, 072017, 072017, 072417, 072417)
+
+sdthreshold<-c(0.33,0.57,0.45, 0.33, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1) #TODO replace w/ actual math
+
+#TODO check the gene lists to make sure that they are correct with the experiment setups in the lab notebook
+
+genelist1<-rep("ANC",96)
+
+genelist2<-rep("ANC",96)
+
+genelist3<-rep(rep(c("ANC", "RAS2", "TOR"), each = 4),8)
+
+genelist4<-rep(rep(c("ANC", "RAS2", "TOR"), each = 1),32)
+
+genelist5<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8)
+
+genelist6<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8)
+
+genelist7<-c(rep("IRA_NON",12),rep("IRA_MIS",12),rep("RAS2",6), rep("TOR",6),rep("ANC",12),rep("RAS2",12), rep("TOR",12), rep("IRA_NON",12),rep("IRA_MIS",12))
+
+genelist8<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+
+genelist9<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+
+genelist10<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+
+genelist11<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+
+genelist12<-rep(c(rep(c("RAS2","ANC","TOR","IRA_NON","IRA_MIS"),2),"TOR","ANC"),8)
+
+genelist13<-rep(c(rep(c("RAS2","ANC","TOR","IRA_NON","IRA_MIS"),2),"TOR","ANC"),8)
+
+genelistmaster<-c(genelist1, genelist2, genelist3, genelist4, genelist5, genelist6, genelist7, genelist8, genelist9, genelist10, genelist11, genelist12, genelist13)
 
 ################starting giant for loop through each experiment###########################
 #for (path in 1:length(experimentlist)){
@@ -72,22 +88,22 @@ while (path<12){
     if (path == 5 | path == 7){
         path<- path+1
     }
-    
+
     raw.data<-read.table(experimentlist[path], sep=",")
-    
+
     ####parsing out unused rows and keeping only mean from every well
-    
+
     GrowthData<-raw.data[as.numeric(which(raw.data[,1]=="Mean")),]
     #head(GrowthData)
     GrowthData<-GrowthData[,-1]
     GrowthData<-GrowthData[,!is.na(GrowthData[1,])] #removing NA
-    
-    
-    
+
+
+
     Rows_to_keep<-as.numeric(which(raw.data[,1]=="Mean"))-3
     rownames(GrowthData)<-raw.data[Rows_to_keep, 1]
-    
-    
+
+
     Time<-list()
     start<-0
     Time<-append(Time, start)
@@ -96,27 +112,27 @@ while (path<12){
         Time<-append(Time, start)
     }
     #as.numeric(Time)
-    
+
     ###changing columns that are factors to numeric
     new.data<-GrowthData
     new.data[,1]<-as.numeric(as.character.factor(new.data[,1]))
     new.data[,4]<-as.numeric(as.character.factor(new.data[,4]))
     new.data[,5]<-as.numeric(as.character.factor(new.data[,5]))
     new.data[,8]<-as.numeric(as.character.factor(new.data[,8]))
-    
+
     #new.data[new.data=="INVALID"]<-0
     #is.na(new.data) <- sapply(new.data, is.infinite)
     #is.na(new.data) <- sapply(new.data, is.nan)
     #new.data[is.na(new.data)]<-0
     #new.data[,256:280]<-0
-    
+
     ####  Sliding window linear modeling
-    
+
     pdf(file  = pdflist[path], width = 16, height = 12)
-    
-    
+
+
     par(mfrow = c(3, 4))
-    
+
     interval=15
     #timeINsec<-raw.data[1,][-1]
     #timeINhrs<-timeINsec/3600
@@ -126,15 +142,13 @@ while (path<12){
     ODinfo<-matrix(0,30,2)
     colnames(info)<-c("Intercept","slope","r.square")
     expo<-matrix(NA,96,3)
-    GR<-matrix(0,96,10)
+    GR<-matrix(0,96,11)
     GR<-as.data.frame(GR)
-    #new.data<-raw.data[,-1]
-    #WellID<-raw.data[,1][-1]
     WellID<-rownames(new.data)
     Growth_Rates<-list()
     print("entering for loop")
     for(j in 1:96){
-       
+
        print(j)
         y<-as.numeric(log(abs(as.numeric(new.data[j,]))))
         y[which(y[]=="-Inf")]<-0
@@ -147,17 +161,17 @@ while (path<12){
             info[k,2]<-coef(l)[2] #slope
             info[k,3]<-summary(l)$adj.r.squared
         }
-    
+
         #z<-lm(info[1:,2]~t[1:20]) #is this actually right?
         9
         horiz<-info[which.min(abs(info[1:20,2])),1] #y-intercept of slope closest to 0
         tophoriz<-info[nrow(info),1] #y-intercept of last point for calculating exp phase
-        
+
         GR[j,1]<-as.character(WellID[j])
         GR[j,4]<-as.numeric(info[nrow(info),1])
         GR[j,6]<-sd(y,na.rm=TRUE)
         GR[j,5]<-as.numeric(max(info[40:nrow(info),3],na.rm=T))
-        
+
         if(max(info[40:nrow(info),3],na.rm=T)>=0.8 ){  ###  Find the fit with the highest growth rate and R^2 at least 0.95
             expo[j,1]<-max(info[which(info[40:nrow(info),3]>0.8),2]) #max slope
             slope<-max(info[which(info[40:nrow(info),3]>0.8),2])
@@ -165,41 +179,41 @@ while (path<12){
             expo[j,2]<-(horiz-y_int)/expo[j,1] #calculating the x intercept for lag phase
             expo[j,3]<-(tophoriz-y_int)/expo[j,1] #calculating the intersection of exp phase and saturation for length of exp.
             #expo[j,2]<-(-1)*max(info[which(info[40:nrow(info),3]>0.8),2])/expo[j,1] #calculating the intercept
-            
+
             GR[j,3]<-expo[j,1] #max slope
             GR[j,8]<-expo[j,2] #start of lag phase
             GR[j,9]<-expo[j,3] #start of exponential
             GR[j,10]<-expo[j,3]-expo[j,2] #calculating length of exponential
-            
+
             print("plotting!!!")
             plot(t,y,pch=10,main=as.character(WellID[j]),ylim=c(min(log(new.data[1:nrow(new.data),2:ncol(new.data)]),na.rm=T),max(log(new.data[1:nrow(new.data),2:ncol(new.data)]),na.rm=T)),xlab='Time (hr)',ylab='log(OD)')
-        
-            
+
+
             if (info[nrow(info),2]>0.02) { #seeing if last point is steep, if it is, carrying cap not reached
                 legend('bottomright',legend="Carrying Capacity not reached")
                 print(path)
                 print(j)
                 print("Carrying cap not reached")
-                
+
                 GR[j,3]<- 0
                 GR[j,8]<- 0
                 GR[j,9]<- 0
                 GR[j,10]<- 0
 
-                
+
             } else if(GR[j,6]<sdthreshold[path]){
                 legend('bottomright',legend="Standard Deviation is way off")
                 print(path)
                 print(j)
                 print("STANDARD DEVIATION IS OFF FOR THIS ONE")
-               
+
                 GR[j,3]<- 0
                 GR[j,8]<- 0
                 GR[j,9]<- 0
                 GR[j,10]<- 0
 
-                
-                
+
+
             } else if(expo[j]>.005){
                 print("minimum bound")
                 abline(info[(match(max(info[which(info[,3]>0.8),2]),info)-dim(info)[1])],max(info[which(info[,3]>0.8),2]))
@@ -211,21 +225,21 @@ while (path<12){
             } else {
                 print("oh noooo no detectable growthhhh")
                  legend('bottomright',legend="No Detectable Growth")
-                 
+
                  GR[j,3]<- 0
                  GR[j,8]<- 0
                  GR[j,9]<- 0
                  GR[j,10]<- 0
             }
-            
-            
+
+
         }else{
             print(path)
             print(j)
             print("no detectable growth")
             plot(t,y,pch=10,main=as.character(WellID[j]),ylim=c(min(log(new.data[1:nrow(new.data),2:ncol(new.data)]),na.rm=T),max(log(new.data[1:nrow(new.data),2:ncol(new.data)]),na.rm=T)),xlab='Time (hr)',ylab='log(OD)')
             legend('bottomright',legend="No Detectable Growth")
-            
+
             GR[j,3]<- 0
             GR[j,8]<- 0
             GR[j,9]<- 0
@@ -233,85 +247,41 @@ while (path<12){
             }
         }
     dev.off()
-    
+
     GR<-as.data.frame(GR)
-    colnames(GR)<-c("Well","Date","FinalRate", "MaxSlope", "CarryingCapacity", "SD", "Condition", "LagPhaseLength", "ExpPhaseStart", "ExpPhaseLength")
-    
+    colnames(GR)<-c("Well","Date","FinalRate", "MaxSlope", "CarryingCapacity", "SD", "Condition", "LagPhaseLength", "ExpPhaseStart", "ExpPhaseLength", "Gene")
+
     GR$Date<-datelist[path]
     
-    if (path == 1 ) {
-        GR$Gene<-"ANC"
-        GR$Condition<-C1
-        GR1<-GR
-        
-    } else if (path == 2) {
-        GR$Gene<-"ANC"
-         GR$Condition<-C2
-         GR2<-GR
-         
-    } else if (path == 3){
-        GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 4),8) # run 3
-         GR$Condition<-C3
-         GR3<-GR
-         
-    } else if (path == 4){
-        GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 1),32) # run 4
-        GR$Condition<-C4
-        GR4<-GR
-        
-    } else if (path == 5){
-        GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 5
-        GR$Condition<-C5
-        GR5<-GR
-        
-    } else if (path == 6){
-         GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 6
-        GR$Condition<-C6
-        
-    } else if (path == 7){
-        GR$Gene<-c(rep("IRA_NON",12),rep("IRA_MIS",12),rep("RAS2",6), rep("TOR",6),rep("ANC",12),rep("RAS2",12), rep("TOR",12), rep("IRA_NON",12),rep("IRA_MIS",12))
-        GR$Condition<-C7
-        
-    } else if (path == 8){
-        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
-        GR$Condition<-C8
-        
-    } else if (path == 9 | path == 10 | path == 11) {
-        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
-        GR$Condition<-C9
-        
-    } else {
-        print("none of the paths were listed above, genes not assigned!!")
-    }
-    
-    
+    GR$Gene<-genelistmaster[path]
+    GR$Condition<-conditionlist[path]
+    assign(gsub(" ","", paste("GR",as.character(path))),GR)
 
-    
     save(GR, file = grfilelist[path])
-    
+
     if (path == 1){
         alldata<-GR
     } else {
         alldata<-rbind(alldata,GR)
     }
-    
-    print("Done running experiment")
+
+    print("**********************Done running experiment*******************")
     print(path)
     path<-path+1
-    
+
 }
 
-alldata$SD<-as.numeric(as.character(alldata$SD))
+#alldata$SD<-as.numeric(as.character(alldata$SD))
 
-GR6<-matrix(0,96,10)
-GR6<-alldata[which(alldata$Date==060617),]
-rownames(GR6)<-c(1:96)
-GR6<-subset(GR6[,1:11])
+#GR6<-matrix(0,96,10)
+#GR6<-alldata[which(alldata$Date==060617),]
+#rownames(GR6)<-c(1:96)
+#GR6<-subset(GR6[,1:11])
 
-GR8<-matrix(0,96,10)
-GR8<-alldata[which(alldata$Date==061317),]
-rownames(GR8)<-c(1:96)
-GR8<-subset(GR8[,1:11])
+#GR8<-matrix(0,96,10)
+#GR8<-alldata[which(alldata$Date==061317),]
+#rownames(GR8)<-c(1:96)
+#GR8<-subset(GR8[,1:11])
 
 
 alldata$Row<-rep(rep(c("A","B","C","D","E","F","G","H"),each=12),6)
@@ -500,18 +470,18 @@ par(mfrow=c(1,2))
 timeINmin<-timeINsec/60
 timeINhrs<-timeINsec/3600
 
-plot(timeINhrs, new.data[1,2:dim(new.data)[2]], ylim=c(min(new.data[,2:dim(new.data)[2]]),max(new.data[,2:dim(new.data)[2]])))   
+plot(timeINhrs, new.data[1,2:dim(new.data)[2]], ylim=c(min(new.data[,2:dim(new.data)[2]]),max(new.data[,2:dim(new.data)[2]])))
 
 for (i in 2:9){
   points(timeINhrs, new.data[i,2:dim(new.data)[2]], col=rgb(runif(1),runif(1),runif(1)))
-}  
+}
 
 ### Quick plot of log OD measurements
-plot(timeINhrs, log(new.data[1,2:dim(new.data)[2]]), ylim=c(min(log(new.data[,2:dim(new.data)[2]])),max(log(new.data[,2:dim(new.data)[2]]))))  
+plot(timeINhrs, log(new.data[1,2:dim(new.data)[2]]), ylim=c(min(log(new.data[,2:dim(new.data)[2]])),max(log(new.data[,2:dim(new.data)[2]]))))
 
 for (i in 2:9){
   points(timeINhrs, log(new.data[i,2:dim(new.data)[2]]), col=rgb(runif(1),runif(1),runif(1)))
-}  
+}
 
 
 library(ggplot2)
@@ -545,6 +515,3 @@ ggplot(subset(KillCurve, KillCurve$GB!="Rec" & KillCurve$Numbers!="5"& KillCurve
 p<-ggplot(alldata, aes(x=SD)) + geom_histogram(binwidth=0.03)  + facet_grid(.~Date)
 intercept<-data.frame(Date = c(042017,042617,042817), int = c(0.33,0.57,0.45))
 p + geom_vline(aes(xintercept=int),intercept)
-
-
-
