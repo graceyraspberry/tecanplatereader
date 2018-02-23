@@ -4,7 +4,7 @@ library(ggplot2)
 library(lme4)
 
 #### specifying paths and various conditions####################
-
+ 
 experimentlist<-c("/users/human/Desktop/Tecan/041717_First_Tecan_Run.csv", "/users/human/Desktop/Tecan/042017_Second_Tecan_Run.csv", "/users/human/Desktop/Tecan/042617_Third_Tecan_Run.csv", "/users/human/Desktop/Tecan/051517_Fourth_Tecan_Run.csv", "/users/human/Desktop/Tecan/052317_Fifth_Tecan_Run-3.csv", "/users/human/Desktop/Tecan/060617_Sixth_Tecan_Run.csv", "/users/human/Desktop/Tecan/060717_Seventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/061317_Eighth_Tecan_Run.csv", "/users/human/Desktop/Tecan/071317_Ninth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Tenth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072017_Eleventh_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Twelth_Tecan_Run.csv", "/users/human/Desktop/Tecan/072417_Thirteenth_Tecan_Run.csv")
 
 #paths to graph files
@@ -83,9 +83,13 @@ genelistmaster<-c(genelist1, genelist2, genelist3, genelist4, genelist5, genelis
 
 ################starting giant for loop through each experiment###########################
 #for (path in 1:length(experimentlist)){
+
+parse.fraiser<- function(experimentID){
+    
+}
 path<- 9
 while (path<12){
-    if (path == 5 | path == 7){
+    if (path == 5 | path == 7 | path == 11 | path == 13){
         path<- path+1
     }
 
@@ -253,9 +257,57 @@ while (path<12){
 
     GR$Date<-datelist[path]
     
-    GR$Gene<-genelistmaster[path]
-    GR$Condition<-conditionlist[path]
-    assign(gsub(" ","", paste("GR",as.character(path))),GR)
+    #GR$Gene<-genelistmaster[path]
+    #GR$Condition<-conditionlist[path]
+    
+    if (path == 1 ) {
+        GR$Gene<-"ANC"
+        GR$Condition<-C1
+        GR1<-GR
+        
+    } else if (path == 2) {
+        GR$Gene<-"ANC"
+        GR$Condition<-C2
+        GR2<-GR
+        
+    } else if (path == 3){
+        GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 4),8) # run 3
+        GR$Condition<-C3
+        GR3<-GR
+        
+    } else if (path == 4){
+        GR$Gene<-rep(rep(c("ANC", "RAS2", "TOR"), each = 1),32) # run 4
+        GR$Condition<-C4
+        GR4<-GR
+        
+    } else if (path == 5){
+        GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 5
+        GR$Condition<-C5
+        GR5<-GR
+        
+    } else if (path == 6){
+        GR$Gene<-rep(rep(c("RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS", "RAS2", "TOR", "ANC", "IRA_NON", "IRA_MIS","IRA_NON", "IRA_MIS"), each = 1),8) # run 6
+        GR$Condition<-C6
+        
+    } else if (path == 7){
+        GR$Gene<-c(rep("IRA_NON",12),rep("IRA_MIS",12),rep("RAS2",6), rep("TOR",6),rep("ANC",12),rep("RAS2",12), rep("TOR",12), rep("IRA_NON",12),rep("IRA_MIS",12))
+        GR$Condition<-C7
+        
+    } else if (path == 8){
+        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+        GR$Condition<-C8
+        
+    } else if (path == 9 | path == 10 | path == 11) {
+        GR$Gene<-c(rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("RAS2", 12), rep("ANC", 12), rep("TOR", 12), rep("IRA_NON", 12), rep("IRA_MIS", 12), rep("ANC", 12))
+        GR$Condition<-C9
+        
+    } else if (path == 12 | path == 13){
+        GR$Gene<-rep(c(rep(c("RAS2","ANC","TOR","IRA_NON","IRA_MIS"),2),"TOR","ANC"),8)
+        GR$Condition<-C10
+        print("none of the paths were listed above, genes not assigned!!")
+    }
+    
+    #assign(gsub(" ","", paste("GR",as.character(path))),GR)
 
     save(GR, file = grfilelist[path])
 
