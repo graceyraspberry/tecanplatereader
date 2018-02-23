@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/graceyraspberry/tecanplatereader/BacteriaComicBeatrice-02_web.png" width="500">
+  <img src="https://github.com/graceyraspberry/tecanplatereader/blob/master/BacteriaComicBeatrice-02_web.png" width="500">
 </p>
 
 ### tecanplatereader
